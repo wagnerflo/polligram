@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "polligram"
+authors = [
+  { name = "Florian Wagner", email = "florian@wagner-flo.de" },
+]
+description = "Poll stuff online and notify about it by Telegram message"
+requires-python = ">=3.12"
+license = { text = "BSD-3-Clause" }
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: No Input/Output (Daemon)",
+  "Framework :: AsyncIO",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Communications :: Chat",
+  "Topic :: Internet :: WWW/HTTP",
+]
+dependencies = [
+  "APScheduler>=3.10",
+  "babel>=2.14.0",
+  "httpx>=0.27",
+  "Pyrogram>=2.0.106",
+  "watchfiles>=0.21",
+]
+dynamic = [ "version" ]
+
+[project.optional-dependencies]
+html = [ "beautifulsoup4>=4.12", "html5lib>=1.1" ]
+json = [ "jsonpath-ng>=1.5.3" ]
+
+[project.scripts]
+polligram = "polligram.__main__:main"
