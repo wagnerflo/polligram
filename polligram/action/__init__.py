@@ -73,6 +73,8 @@ class Action(ABC):
 
 class HTTPAction(Action):
     async def default_fetch(self):
+        if iscoroutinefunction(kwargs := self.getattr("request_kwargs", {})):
+            kwargs = await kwargs(self)
         resp = await self.http.request(
             self.getattr("method", "GET"),
             self.getattr("url"),
