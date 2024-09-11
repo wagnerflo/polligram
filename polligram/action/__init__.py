@@ -78,13 +78,15 @@ class HTTPAction(Action):
         resp = await self.http.request(
             self.getattr("method", "GET"),
             self.getattr("url"),
-            **self.getattr("request_kwargs", {})
+            **kwargs
         )
         match self.getattr("decode", "text"):
             case "text":
                 return resp.text
             case "json":
                 return resp.json
+            case func if callable(func):
+                return func(resp)
 
     async def init(self):
         self.http = AsyncClient()
