@@ -71,13 +71,13 @@ class Action(ABC):
 
 class HTTPAction(Action):
     async def default_fetch(self):
+        if iscoroutinefunction(method := self.getattr("method", "GET")):
+            method = await method(self)
+        if iscoroutinefunction(url := self.getattr("url")):
+            url = await url(self)
         if iscoroutinefunction(kwargs := self.getattr("request_kwargs", {})):
             kwargs = await kwargs(self)
-        resp = await self.http.request(
-            self.getattr("method", "GET"),
-            self.getattr("url"),
-            **kwargs
-        )
+        resp = await self.http.request(method, url, **kwargs)
         match self.getattr("decode", "text"):
             case "text":
                 return resp.text
