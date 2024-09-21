@@ -70,15 +70,15 @@ async def start():
         except:
             print_exc()
 
-    async def update_jobs(action=None):
-        if action is not None:
-            modules.pop(action, None)
+    async def update_jobs(action_name=None):
+        if action_name is not None:
+            modules.pop(action_name, None)
 
         for jobid,value in conf.items():
             if jobid == "global":
                 continue
 
-            if action is not None and value["action"] != action:
+            if action_name is not None and value["action"] != action_name:
                 continue
 
             if (job := scheduler.get_job(jobid)) is not None:
