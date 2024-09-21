@@ -14,11 +14,12 @@ from .db import Database
 from .action import Action
 from .tg import TelegramClient
 
-async def run_action(action, conf, jobid, tg, db):
+async def run_action(action, glbconf, jobid, tg, db):
     hashes = { h for h in db.get_hashes(jobid) }
     messages = await action.run()
     update_db = False
-    locale = conf["global"]["LOCALE"]
+    locale = glbconf["LOCALE"]
+    debug = glbconf.get("DEBUG", False)
 
     for msg in messages:
         if msg.hash not in hashes:
@@ -28,7 +29,7 @@ async def run_action(action, conf, jobid, tg, db):
                 msg.format(locale, jobid, action)
             )
 
-    if update_db:
+    if not debug and update_db:
         db.set_hashes(jobid, [msg.hash for msg in messages])
 
 async def start():
@@ -85,7 +86,7 @@ async def start():
             scheduler.add_job(
                 run_action,
                 trigger=CronTrigger.from_crontab(action.cron),
-                args=(action, conf, key, tg, db),
+                args=(action, glb, key, tg, db),
                 id=key,
                 next_run_time=action.next_run_time,
             )
