@@ -99,8 +99,12 @@ async def start():
                 next_run_time=action.next_run_time,
             )
 
+    api_id = glb["API_ID"]
+    api_hash = glb["API_HASH"]
+    bot_token = glb["BOT_TOKEN"]
+
     async with ( AsyncExitStack() as stack,
-                 TelegramClient(glb["API_ID"], glb["API_HASH"]) as tg ):
+                 TelegramClient(api_id, api_hash, bot_token) as tg ):
         db = Database(tg.storage.conn)
 
         await update_jobs()
