@@ -2,7 +2,9 @@ from abc import ABC, abstractmethod
 from asyncio import iscoroutinefunction
 from datetime import datetime
 from httpx import AsyncClient
+from logging import getLogger
 
+logger = getLogger("polligram")
 NO_DEFAULT = object()
 
 class Action(ABC):
@@ -48,7 +50,9 @@ class Action(ABC):
         return raw
 
     async def run(self):
-        data = await self.convert(await self.fetch())
+        if (data := await self.convert(await self.fetch())) is None:
+            logger.warning("Fetch returned no data. Not running action.")
+            return []
         if action := self.getattr("action", None):
             data = await action(self, data)
         return data
@@ -78,6 +82,9 @@ class HTTPAction(Action):
         if iscoroutinefunction(kwargs := self.getattr("request_kwargs", {})):
             kwargs = await kwargs(self)
         resp = await self.http.request(method, url, **kwargs)
+        if resp.status_code != 200:
+            logger.warning(f"HTTP request returned status {resp.status_code}.")
+            return
         match self.getattr("decode", "text"):
             case "text":
                 return resp.text
