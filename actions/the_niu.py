@@ -4,6 +4,7 @@ from polligram import Msg
 
 inherit = "http"
 cron = "0 3 * * *"
+message = '{{ jobid }}: {{ fprice(price) }}'
 
 RE_MAIN_JS = regex(r'"([^"]+/main-es2015\.[^"]+.js)"')
 RE_CLIENT_SECRET = regex(r'clientSecret:"([^"]{32})"')

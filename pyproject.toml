@@ -22,6 +22,7 @@ dependencies = [
   "APScheduler>=3.10",
   "babel>=2.14.0",
   "httpx>=0.27",
+  "Jinja2>=3.1",
   "Pyrogram>=2.0.106",
   "watchfiles>=0.21",
 ]

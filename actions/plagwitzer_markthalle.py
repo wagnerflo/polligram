@@ -1,10 +1,13 @@
 from datetime import datetime
-from polligram import Msg
+from polligram import *
 
 inherit = "html"
 cron = "0 3 * * *"
 url = "https://plagwitzer-markthalle.de"
-message = "{jobid} {fdate(dt)} {time}: <a href=\"{href}\">{text}</a>"
+message = '''
+{{ jobid }} {{ fdate(dt) }} {{ time }}: \
+<a href="{{ href }}">{{ text }}</a>
+'''
 
 ignore = (
     "Egenberger Lebensmittel",

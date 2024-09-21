@@ -10,4 +10,5 @@ class TelegramClient(Client):
         return await self.send_message(
             chatid, msg,
             parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
         )

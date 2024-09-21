@@ -1,4 +1,4 @@
-from asyncio import run,sleep
+from asyncio import run
 from contextlib import AsyncExitStack
 from importlib.util import spec_from_file_location, module_from_spec
 from pathlib import Path
@@ -7,7 +7,6 @@ from traceback import print_exc
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from babel.dates import format_date
 from watchfiles import awatch, Change
 
 from .conf import Config
@@ -19,20 +18,14 @@ async def run_action(action, conf, jobid, tg, db):
     hashes = { h for h in db.get_hashes(jobid) }
     messages = await action.run()
     update_db = False
-
-    def fdate(dt):
-        return format_date(dt, format="full", locale=conf["global"]["locale"])
+    locale = conf["global"]["LOCALE"]
 
     for msg in messages:
         if msg.hash not in hashes:
             update_db = True
             await tg.send(
                 action.chatid,
-                action.message_format.format_map({
-                    "jobid": jobid,
-                    "fdate": fdate,
-                    **msg.data,
-                })
+                msg.format(locale, jobid, action)
             )
 
     if update_db:

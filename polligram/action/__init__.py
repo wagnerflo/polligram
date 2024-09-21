@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from asyncio import iscoroutinefunction
 from datetime import datetime
-
 from httpx import AsyncClient
 
 NO_DEFAULT = object()
@@ -63,9 +62,8 @@ class Action(ABC):
         return self.config["chatid"]
 
     @property
-    def message_format(self):
-        return self.config.get(
-            "message", self.getattr("message", "{jobid}: {msg}"))
+    def message_template(self):
+        return self.config.get("message", self.getattr("message"))
 
     @property
     def next_run_time(self):
