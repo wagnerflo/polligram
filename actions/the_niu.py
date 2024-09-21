@@ -3,7 +3,7 @@ from re import compile as regex
 from polligram import Msg
 
 inherit = "http"
-cron = "0 3 * * *"
+cron = "0,30 * * * *"
 message = '{{ jobid }}: {{ fprice(price) }}'
 
 RE_MAIN_JS = regex(r'"([^"]+/main-es2015\.[^"]+.js)"')

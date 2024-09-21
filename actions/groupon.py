@@ -1,7 +1,7 @@
 from polligram import *
 
 inherit = "html"
-cron = "0 3 * * *"
+cron = "0 * * * *"
 url = "https://www.groupon.de/partial/browse/get-paginated-cards"
 message = '''
 <a href="{{ href }}">{{ jobid }} für {{ fprice(price) }}</a>
