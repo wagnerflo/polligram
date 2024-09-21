@@ -12,6 +12,7 @@ class Config(Mapping):
         self.reload()
 
     def reload(self):
+        logger.info("Reloading configuration.")
         with open(self.path, "rb") as fp:
             try:
                 self._data = decode_toml(fp)

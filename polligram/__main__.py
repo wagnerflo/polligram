@@ -1,6 +1,11 @@
 from asyncio import run
 from contextlib import AsyncExitStack
 from importlib.util import spec_from_file_location, module_from_spec
+from logging import (
+    getLogger,
+    basicConfig as configLogging,
+    INFO as LOGGING_INFO,
+)
 from pathlib import Path
 from traceback import print_exc
 
@@ -13,6 +18,8 @@ from .conf import Config
 from .db import Database
 from .action import Action
 from .tg import TelegramClient
+
+logger = getLogger("polligram")
 
 async def run_action(action, glbconf, jobid, tg, db):
     hashes = { h for h in db.get_hashes(jobid) }
@@ -67,14 +74,14 @@ async def start():
         if action is not None:
             modules.pop(action, None)
 
-        for key,value in conf.items():
-            if key == "global":
+        for jobid,value in conf.items():
+            if jobid == "global":
                 continue
 
             if action is not None and value["action"] != action:
                 continue
 
-            if (job := scheduler.get_job(key)) is not None:
+            if (job := scheduler.get_job(jobid)) is not None:
                 await job.args[0].destroy()
                 job.remove()
 
@@ -83,11 +90,12 @@ async def start():
 
             action = Action.from_module(module, value)
             await action.init()
+            logger.info(f"Adding job: {jobid}.")
             scheduler.add_job(
                 run_action,
                 trigger=CronTrigger.from_crontab(action.cron),
-                args=(action, glb, key, tg, db),
-                id=key,
+                args=(action, glb, jobid, tg, db),
+                id=jobid,
                 next_run_time=action.next_run_time,
             )
 
@@ -108,6 +116,11 @@ async def start():
 
 def main():
     try:
+        configLogging(
+            level=LOGGING_INFO,
+            datefmt="%Y-%m-%d %H:%M:%S",
+            format='%(asctime)s [%(name)s] %(message)s',
+        )
         run(start())
     except KeyboardInterrupt:
         pass
