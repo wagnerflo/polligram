@@ -12,7 +12,10 @@ class Msg:
     def __init__(self, id, **data):
         self.id = id
         self.hash = blake2b(str(id).encode("utf-8")).hexdigest()
-        self.data = data
+        self._data = data
+
+    def __getattr__(self, key):
+        return self._data[key]
 
     def format(self, locale, jobid, action):
         def fdate(dt):
@@ -26,4 +29,4 @@ class Msg:
             "fdate": fdate,
             "fprice": fprice,
         })
-        return tmpl.render(**self.data).strip()
+        return tmpl.render(**self._data).strip()
