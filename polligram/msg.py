@@ -1,4 +1,4 @@
-from babel.dates import format_date
+from babel.dates import format_date, format_time
 from babel.numbers import format_currency
 from hashlib import blake2b
 from jinja2 import Environment, StrictUndefined
@@ -21,12 +21,20 @@ class Msg:
         def fdate(dt):
             return format_date(dt, format="full", locale=locale)
 
+        def ftime(dt):
+            return format_time(dt, format="short", locale=locale)
+
+        def fdatetime(dt):
+            return f"{fdate(dt)} {ftime(dt)}"
+
         def fprice(num, currency="EUR"):
             return format_currency(num, currency, locale=locale)
 
         tmpl = env.from_string(action.message_template, globals={
             "jobid": jobid,
             "fdate": fdate,
+            "ftime": ftime,
+            "fdatetime": fdatetime,
             "fprice": fprice,
         })
         return tmpl.render(**self._data).strip()
