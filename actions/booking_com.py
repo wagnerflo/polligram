@@ -47,9 +47,7 @@ async def request_kwargs(job):
                 "Gecko/20100101 Firefox/129.0"
             ),
         },
-        cookies={
-            "bkng_sso_auth": job.config.get("bkng_sso_auth_cookie", None),
-        },
+        cookies=job.config.get("cookies", {}),
         follow_redirects=True,
     )
 
