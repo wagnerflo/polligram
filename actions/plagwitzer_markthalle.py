@@ -38,5 +38,5 @@ def find_events(soup):
             )
         )
 
-async def action(soup):
+async def action(job, soup):
     return [ msg for _,msg in sorted(find_events(soup)) ]

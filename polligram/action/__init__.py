@@ -50,7 +50,7 @@ class Action(ABC):
     async def run(self):
         data = await self.convert(await self.fetch())
         if action := self.getattr("action", None):
-            data = await action(data)
+            data = await action(self, data)
         return data
 
     @property

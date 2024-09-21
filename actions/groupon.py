@@ -32,7 +32,7 @@ async def request_kwargs(job):
         },
     )
 
-async def action(soup):
+async def action(job, soup):
     if not (el := soup.find("figure")):
         return []
 
