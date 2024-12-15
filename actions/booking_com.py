@@ -130,13 +130,19 @@ async def action(job, html):
 
     results = sorted(results, key=lambda i: i.price)
 
-    if only_cheapest:
+    if results and only_cheapest:
         if only_free_cancellation:
             results = results[0:1]
         else:
-            results = [
-                next(filter(lambda i: not bool(i.cancellation_date), results)),
-                next(filter(lambda i: bool(i.cancellation_date), results)),
-            ]
+            results = (
+                first_or_empty(lambda i: not bool(i.cancellation_date), results) +
+                first_or_empty(lambda i: bool(i.cancellation_date), results)
+            )
 
     return results
+
+def first_or_empty(pred, lst):
+    try:
+        return [next(filter(pred, lst))]
+    except StopIteration:
+        return []
