@@ -74,6 +74,8 @@ async def start():
         if action_name is not None:
             modules.pop(action_name, None)
 
+        jobids = set()
+
         for jobid,value in conf.items():
             if jobid == "global":
                 continue
@@ -98,6 +100,12 @@ async def start():
                 id=jobid,
                 next_run_time=action.next_run_time,
             )
+            jobids.add(jobid)
+
+        for job in scheduler.get_jobs():
+            if job.id not in jobids:
+                await job.args[0].destroy()
+                job.remove()
 
     api_id = glb["API_ID"]
     api_hash = glb["API_HASH"]
