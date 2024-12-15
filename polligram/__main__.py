@@ -20,9 +20,14 @@ from .tg import TelegramClient
 
 logger = getLogger("polligram")
 
-async def run_action(action, glbconf, jobid, tg, db):
-    hashes = { h for h in db.get_hashes(jobid) }
+async def run_action(action, glbconf, jobid, tg, db, scheduler):
+    if await action.disabled():
+        await action.destroy()
+        scheduler.remove_job(jobid)
+        return
+
     messages = await action.run()
+    hashes = { h for h in db.get_hashes(jobid) }
     update_db = False
     locale = glbconf["LOCALE"]
     debug = glbconf.get("DEBUG", False)
@@ -73,6 +78,10 @@ async def start():
         if action_name is not None:
             modules.pop(action_name, None)
 
+        async def remove_job(job):
+            await job.args[0].destroy()
+            job.remove()
+
         jobids = set()
 
         for jobid,value in conf.items():
@@ -83,19 +92,22 @@ async def start():
                 continue
 
             if (job := scheduler.get_job(jobid)) is not None:
-                await job.args[0].destroy()
-                job.remove()
+                await remove_job(job)
 
             if (module := load_module(value["action"])) is None:
                 continue
 
             action = Action.from_module(module, value)
             await action.init()
+
+            if await action.disabled():
+                continue
+
             logger.info(f"Adding job: {jobid}.")
             scheduler.add_job(
                 run_action,
                 trigger=CronTrigger.from_crontab(action.cron),
-                args=(action, glb, jobid, tg, db),
+                args=(action, glb, jobid, tg, db, scheduler),
                 id=jobid,
                 next_run_time=action.next_run_time,
             )
@@ -103,8 +115,7 @@ async def start():
 
         for job in scheduler.get_jobs():
             if job.id not in jobids:
-                await job.args[0].destroy()
-                job.remove()
+                await remove_job(job)
 
     api_id = glb["API_ID"]
     api_hash = glb["API_HASH"]

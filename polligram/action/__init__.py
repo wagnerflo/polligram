@@ -49,6 +49,11 @@ class Action(ABC):
     async def convert(self, raw):
         return raw
 
+    async def disabled(self):
+        if iscoroutinefunction(disabled := self.getattr("disabled", None)):
+            return await disabled(self)
+        return False
+
     async def run(self):
         if (data := await self.convert(await self.fetch())) is None:
             logger.warning("Fetch returned no data. Not running action.")
