@@ -1,12 +1,13 @@
-from babel.dates import get_month_names,get_timezone
+from babel.dates import get_month_names
 from datetime import datetime
 from json import loads as json_decode
+from polligram import Msg
 from re import (
     compile as regex,
     search as re_search,
     MULTILINE, VERBOSE, DOTALL,
 )
-from polligram import *
+from zoneinfo import ZoneInfo
 
 inherit = "http"
 cron = "0,30 * * * *"
@@ -21,7 +22,7 @@ Nicht stornierbar\
 Preis {{ fprice(price) }}.
 '''
 
-TZ = get_timezone("Europe/Berlin")
+TZ = ZoneInfo("Europe/Berlin")
 MONTH_NAMES = {
     v:k for k,v in get_month_names("wide", locale="de_DE").items()
 }
