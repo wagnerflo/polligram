@@ -1,5 +1,5 @@
 from babel.dates import get_month_names
-from datetime import datetime
+from datetime import date,datetime
 from json import loads as json_decode
 from polligram import Msg
 from re import (
@@ -27,6 +27,9 @@ MONTH_NAMES = {
     v:k for k,v in get_month_names("wide", locale="de_DE").items()
 }
 LIST_RE = regex(r"^b_rooms_available_and_soldout: (.*),$", MULTILINE)
+
+async def disabled(job):
+    return date.today() > job.config["checkin"]
 
 async def url(job):
     return f'https://www.booking.com/hotel/{job.config["hotel"]}'
