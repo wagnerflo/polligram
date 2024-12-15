@@ -96,8 +96,10 @@ async def action(job, html):
                         data-block-id="{room_id}_
                         .*
                         Kostenlose\ Stornierung</strong>
-                        \ vor\ (\d\d):(\d\d)\ Uhr
-                        \ am\ (\d{{1,2}})\.\ ([^ ]+)\ (\d{{4}})
+                        \ vor
+                        (?:\ (\d\d):(\d\d)\ Uhr)?
+                        \ (?:am|dem)
+                        \ (\d{{1,2}})\.\ ([^ ]+)\ (\d{{4}})
                         .*
                         name="nr_rooms_{room_id}
                         """,
@@ -107,7 +109,7 @@ async def action(job, html):
                     hour,minute,day,month,year = res.groups()
                     cancelation_date = datetime(
                         int(year), MONTH_NAMES[month], int(day),
-                        int(hour), int(minute), tzinfo=TZ,
+                        int(hour or 0), int(minute or 0), tzinfo=TZ,
                     )
                 case _:
                     raise Exception(
