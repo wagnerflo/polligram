@@ -1,5 +1,4 @@
 from asyncio import run
-from contextlib import AsyncExitStack
 from importlib.util import spec_from_file_location, module_from_spec
 from logging import (
     getLogger,
@@ -111,8 +110,7 @@ async def start():
     api_hash = glb["API_HASH"]
     bot_token = glb["BOT_TOKEN"]
 
-    async with ( AsyncExitStack() as stack,
-                 TelegramClient(api_id, api_hash, bot_token) as tg ):
+    async with TelegramClient(api_id, api_hash, bot_token) as tg:
         db = Database(tg.storage.conn)
 
         await update_jobs()
